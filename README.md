@@ -1,41 +1,51 @@
-Outlook Web App Notifications - Firefox extension
-=================
+# OWA Notifications (Modern Redesign)
 
-Firefox extension that adds system notifications capability to [OWA - Outlook Web App](https://en.wikipedia.org/wiki/Outlook_Web_App).
+A Firefox extension that brings **System Notifications** and **Unread Counts** to Outlook Web App (OWA), now with a modern interface and advanced folder monitoring.
 
-The extension is activated if you have an OWA tab open or when you open a new tab and log into OWA. No configuration needed. The extension *doesn't* need any OWA account information, *doesn't* read any private data and *doesn't* connect to the internet to send any data.
+## ✨ Key Features
 
-How it works: when new email or reminder arrives into OWA a system notification about this event will be shown. Also the fav icon and document title of the OWA tab are updated to show the number of unread emails/reminders. The fav icon is updated so that you have visual cues when OWA tab is pinned. Document title is updated so that even if Firefox is not the active window, you will see in the taskbar the number of unread emails/reminders. This helps in situations when you are not at the computer when new emails or reminders arrive and so you don't see the notifications and when you come back you just have to glance over the taskbar to see if there are any unread emails or reminders - no need to remember to activate Firefox window to check emails every time you come back to your computer.
+*   **System Notifications**: Get native desktop notifications when new emails arrive, even if the browser is in the background.
+*   **Folder Monitoring**: Monitor specific folders only (e.g., "Inbox", "Important", "Tickets") and ignore the rest.
+*   **Tag Input System**: Easily add folders to monitor using a modern "chip" interface. Support for bulk copy-paste!
+*   **Smart Indicators**:
+    *   **Favicon Overlay**: Shows unread count directly on the OWA tab icon.
+    *   **Title Update**: Updates tab title (e.g., `(2) Inbox`) for easy checking.
+*   **Modern Settings Page**: A clean, card-based designs with toggle switches and instant validation.
 
-How it really works: for each tab open that has the url in the form "http[s]://anything/owa/anything" or "https://outlook.live.com/mail/anything" or "https://outlook.office365.com/mail/anything" or "https://outlook.office.com/mail/anything" a timer task is set to fire every 1 second by default (configurable). The task counts the number of unread emails or reminders (using some css selectors) and if the count is different than the last one it updates the fav icon and document title and also if it's greater it shows a notification with the number of new unread emails/reminders.
+## 🚀 Installation
 
-With the release of version 1.6.0 users can define their own css selectors for unread emails and reminders detection. A use for this could be for example to monitor only some folders for unread emails.  
-For OWA 2010 the css selector to monitor only Folder1 and Folder2 is:  
-`[fldrnm='Folder1'] + #spnUC #spnCV, [fldrnm='Folder2'] + #spnUC #spnCV`  
-To get the same result for OWA 2013 the css selector is:  
-`[aria-label='Folder Pane'] [title='Folder1'] ~ [id*='.ucount'], [aria-label='Folder Pane'] [title='Folder2'] ~ [id*='.ucount']`  
-In case of X-OWA-ClientBuildVersion:"15.0.847.41" to monitor only Inbox folder the css selector is:
-`span[title="Inbox"] ~ ._n_07`
+### For Developers / Temporary Usage
+1.  Open Firefox and go to `about:debugging`.
+2.  Click **This Firefox** in the sidebar.
+3.  Click **Load Temporary Add-on...**.
+4.  Navigate to the extension folder and select `manifest.json`.
 
-All the predefined css selectors assume you are using English (US). If that is not the case, you might have to adjust them for your language (see https://github.com/mihai-chezan/owa_notifications_firefox_extension/issues/24#issuecomment-519866710).
+## ⚙️ Configuration
 
-The latest approved version of this extension can be installed from [Mozilla's add-ons website](https://addons.mozilla.org/en-US/firefox/addon/outlook-web-app-notifications/) or check the [github releases](https://github.com/mihai-chezan/owa_notifications_firefox_extension/releases) for latest builds.
+1.  Open the extension **Options** from the `about:addons` page or the toolbar.
+2.  **General**:
+    *   **Check Frequency**: How often to scan for new emails (default: 60 seconds).
+    *   **Monitored Folders**: Type folder names here. Press **Enter** or **Comma** to add them as tags. Paste a comma-separated list to add multiple folders at once!
+3.  **Notifications**: Toggle system popups and reminder snoozing.
+4.  **Display**: specific settings for Favicon color and Title updates.
 
+## 📁 Monitored Folders Guide
 
-![Email notification when tab is not active](https://raw.githubusercontent.com/mihai-chezan/owa_notifications_firefox_extension/master/doc/tab-normal.png "Notification when tab is not active")
+By default, the extension monitors **ALL** folders with unread counts.
+To monitor specific folders:
+1.  Go to Options.
+2.  In "Monitored Folders", type the exact name of the folder (e.g., `Inbox`).
+3.  Press Enter.
+4.  Add more folders as needed (e.g., `Projects`, `Urgent`).
+5.  Click **Save Settings**.
 
-![Email notification when tab is pinned and not active](https://raw.githubusercontent.com/mihai-chezan/owa_notifications_firefox_extension/master/doc/tab-pinned.png "Notification when tab is pinned and not active")
+Now, notifications will only trigger for emails in these specific folders!
 
-![Email notification when tab is active](https://raw.githubusercontent.com/mihai-chezan/owa_notifications_firefox_extension/master/doc/tab-active.png "Notification when tab is active")
+## 🛠️ Technical Info
 
-![Email notification when tab is pinned and active](https://raw.githubusercontent.com/mihai-chezan/owa_notifications_firefox_extension/master/doc/tab-pinned-active.png "Notification when tab is pinned and active")
+*   **Manifest V2**: Built for broad compatibility with Firefox.
+*   **Privacy Focused**: Does NOT store credentials. Uses existing OWA session cookies.
+*   **Lightweight**: No heavy background processes; uses efficient DOM parsing.
 
-![Email notification and browser taskbar when other window is active and in focus](https://raw.githubusercontent.com/mihai-chezan/owa_notifications_firefox_extension/master/doc/taskbar.png "Notification and browser taskbar when other window is active and in focus")
-
-![Reminder notification and browser taskbar when other window is active and in focus](https://raw.githubusercontent.com/mihai-chezan/owa_notifications_firefox_extension/master/doc/taskbar-reminder.png "Reminder notification and browser taskbar when other window is active and in focus")
-
-![Reminder notification when tab is active](https://raw.githubusercontent.com/mihai-chezan/owa_notifications_firefox_extension/master/doc/tab-active-reminder.png "Reminder notification when tab is active")
-
-![Preferences](https://raw.githubusercontent.com/mihai-chezan/owa_notifications_firefox_extension/master/doc/preferences.png "Preferences")
-
-Note: this started as a fork of [OWA_firefox_addon by Phil Baranovskiy](https://github.com/rockfield/owa_firefox_addon).
+---
+*Based on the original OWA Notifier, heavily modified and redesigned by Nizen.*
