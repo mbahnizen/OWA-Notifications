@@ -1,9 +1,9 @@
 "use strict";
 
 const notifIcons = {
-  "email": browser.extension.getURL("email-alert.png"),
-  "reminder": browser.extension.getURL("calendar-alert.png"),
-  "chat": browser.extension.getURL("chat-alert.png")
+  "email": browser.runtime.getURL("email-alert.png"),
+  "reminder": browser.runtime.getURL("calendar-alert.png"),
+  "chat": browser.runtime.getURL("chat-alert.png")
 }
 
 browser.runtime.onMessage.addListener(notif => {

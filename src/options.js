@@ -86,7 +86,7 @@ function createTag(label) {
   const div = document.createElement("div");
   div.setAttribute("class", "tag");
   const span = document.createElement("span");
-  span.innerHTML = label;
+  span.textContent = label;
   const closeBtn = document.createElement("span");
   closeBtn.setAttribute("class", "close-btn");
   closeBtn.innerHTML = "×"; // &times;
