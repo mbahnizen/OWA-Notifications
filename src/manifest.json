@@ -3,7 +3,7 @@
   "name": "Outlook Web App Notifications",
   "short_name": "OWA Notifications",
   "description": "Add system notifications capability to OWA (Outlook Web App). No configuration needed. System notifications about new emails or reminders are shown, the fav icon and window title are also updated with the unread email/reminder count.",
-  "version": "1.1",
+  "version": "1.2",
   "author": "mbahnizen",
   "icons": {
     "48": "icon.png"
@@ -36,7 +36,13 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "owa_notifications@mbahnizen",
-      "strict_min_version": "57.0"
+      "strict_min_version": "57.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ],
+        "optional": []
+      }
     }
   }
 }
