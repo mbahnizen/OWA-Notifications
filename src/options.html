@@ -1,186 +1,169 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="utf-8">
-<style>
-*,*:before,*:after {
-  box-sizing: border-box;
-}
-
-form {
-  font-size: 1.25rem;
-}
-
-legend {
-  padding: 0 0.5rem;
-}
-
-.pref-container {
-  display: flex;
-}
-
-.pref-description {
-  flex: 1;
-  margin-right: 1em;
-}
-
-.pref-explanation {
-  font-size: smaller;
-  color: graytext;
-  margin: -0.1em 0.5em 0.5em 2em;
-}
-
-.pref-input {
-  flex: 2;
-}
-
-.pref-input > input[type="number"] {
-  width: 100%;
-}
-
-.pref-input > input[type="text"] {
-  width: 100%;
-}
-
-.pref-input > select {
-  width: 100%;
-}
-
-button {
-  font-size: 1em;
-  padding: 0.2em 1em;
-}
-</style>
+  <meta charset="utf-8">
+  <title>OWA Notifications Settings</title>
+  <link rel="stylesheet" href="options.css">
 </head>
+
 <body>
-  <form>
-    <fieldset>
-      <legend>Settings:</legend>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="delayBetweenChecks">Seconds to wait between checks</label>
-          <div class="pref-explanation">Controls how fast new emails/reminders are detected and notifications will appear. Lower value
-            means faster reaction. Minimum allowed value is 1.</div>
+  <div class="container">
+    <header>
+      <h1>OWA Notifications Settings</h1>
+    </header>
+
+    <form>
+      <!-- General Settings -->
+      <div class="card">
+        <div class="section-title">General</div>
+
+        <div class="form-group">
+          <label for="delayBetweenChecks">Check Frequency (seconds)</label>
+          <div class="help-text">How often to check for new emails. Lower value means faster detection (minimum 1).
+          </div>
+          <input id="delayBetweenChecks" type="number" min="1">
         </div>
-        <div class="pref-input">
-          <input id="delayBetweenChecks" type="number" min="1" required>
-        </div>
-      </div>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="delayBetweenReminders">Reminder snooze time</label>
-          <div class="pref-explanation">When reminders are not dismissed/snoozed a reminder notification will keep showing up every
-            'Reminder snooze time' seconds. Set this to zero to disable it.</div>
-        </div>
-        <div class="pref-input">
-          <input id="delayBetweenReminders" type="number" min="0" required>
-        </div>
-      </div>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="disableNotifications">Disable Notifications</label>
-          <div class="pref-explanation">Toggle for disabling notifications. When checked, new emails, reminders or chat events won't 
-            trigger the display of notifications anymore, but the update of favicon and document title will continue (if those options 
-            are active)</div>
-        </div>
-        <div class="pref-input">
-          <input id="disableNotifications" type="checkbox">
+
+        <div class="form-group">
+          <label for="monitoredFoldersInput">Monitored Folders</label>
+          <div class="help-text">Type folder name and press Enter or Comma to add. Click X to remove.</div>
+          <div id="tagContainer" class="tag-container">
+            <input id="monitoredFoldersInput" type="text" placeholder="Add folder..." autocomplete="off">
+          </div>
+          <input id="monitoredFolders" type="hidden">
         </div>
       </div>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="updateFavIcon">Update Favicon</label>
-          <div class="pref-explanation">Toggle for updating the favicon. When checked, the total count of all emails, reminders and chat 
-            events will be displayed as a number on the webpage icon.</div>
+
+      <!-- Notifications & Alerts -->
+      <div class="card">
+        <div class="section-title">Notifications</div>
+
+        <div class="form-group toggle-row">
+          <div class="toggle-label">
+            <label for="disableNotifications">Disable System Notifications</label>
+            <div class="help-text">If enabled, you won't get pop-up alerts, but the icon/title will still update.</div>
+          </div>
+          <label class="toggle-switch">
+            <input id="disableNotifications" type="checkbox">
+            <span class="slider"></span>
+          </label>
         </div>
-        <div class="pref-input">
-          <input id="updateFavIcon" type="checkbox">
+
+        <div class="form-group">
+          <label for="delayBetweenReminders">Reminder Snooze Time (seconds)</label>
+          <div class="help-text">Repeat interval for reminder notifications. Set to 0 to disable repeating.</div>
+          <input id="delayBetweenReminders" type="number" min="0">
         </div>
       </div>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="updateFavIcon">Favicon color</label>
-          <div class="pref-explanation">Customize favicon background color.</div>
+
+      <!-- Display Settings -->
+      <div class="card">
+        <div class="section-title">Display</div>
+
+        <div class="form-group toggle-row">
+          <div class="toggle-label">
+            <label for="updateDocumentTitle">Update Page Title</label>
+            <div class="help-text">Show unread count in the tab title (e.g., "(2) Inbox").</div>
+          </div>
+          <label class="toggle-switch">
+            <input id="updateDocumentTitle" type="checkbox">
+            <span class="slider"></span>
+          </label>
         </div>
-        <div class="pref-input">
+
+        <div class="form-group toggle-row">
+          <div class="toggle-label">
+            <label for="updateFavIcon">Update Favicon</label>
+            <div class="help-text">Show unread count overlay on the tab icon.</div>
+          </div>
+          <label class="toggle-switch">
+            <input id="updateFavIcon" type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <label for="favIconColor">Favicon Badge Color</label>
+            <div class="help-text">Background color for the unread count badge.</div>
+          </div>
           <input id="favIconColor" type="color">
         </div>
       </div>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="updateDocumentTitle">Update Document Title</label>
-          <div class="pref-explanation">Toggle for updating document title. When checked, the webpage document title will be updated 
-            with the counters of emails, reminders and chat events</div>
+
+      <!-- Advanced Settings -->
+      <div class="card">
+        <div class="section-title">Advanced</div>
+        <div class="help-text" style="margin-bottom: 16px;">
+          Custom CSS selectors for detecting unread counts. Only change this if automatic detection fails.
         </div>
-        <div class="pref-input">
-          <input id="updateDocumentTitle" type="checkbox">
-        </div>
+
+        <details>
+          <summary>Show Custom Selectors</summary>
+          <div class="advanced-content">
+            <div class="form-group">
+              <label for="selectCssForUnreadEmailsDetection">Unread Emails Selector</label>
+              <select id="selectCssForUnreadEmailsDetection">
+                <option value=''>Auto</option>
+                <option value=''>Custom</option>
+                <option value='#mailtree #spnUC #spnCV'>OWA 2010 (ignore favourites)</option>
+                <option value='[fldrnm="Unread Mail"] + #spnUC #spnCV'>OWA 2010 (Unread Mail virtual folder)</option>
+                <option value='[fldrnm="Inbox"] + #spnUC #spnCV'>OWA 2010 (just Inbox)</option>
+                <option value='[aria-label="Folder Pane"] [title="Inbox"] ~ [id*=".ucount"]'>OWA 2013 v1 (just Inbox)
+                </option>
+                <option value='span[title="Inbox"] ~ ._n_07'>OWA 2013 v2 (just Inbox)</option>
+                <option value='span[title="Inbox"]._n_u4 ~._n_A4 ._n_x4[autoid]'>OWA 2013 v3 (just Inbox)</option>
+                <option value='span[title="Inbox"] + div > span'>OWA 365 Personal (just Inbox)</option>
+                <option
+                  value='.treeHeaderContainer + [id="MailFolderPane.FavoritesFolders"] [title="Inbox"] + div > span'>OWA
+                  365 Enterprise v1 (just Inbox from Favorites)</option>
+                <option
+                  value='#MailFolderPane\.FavoritesFolders > div:nth-child(1) .canShowFavoritesAction > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) span'>
+                  OWA 365 Enterprise v2 (from Favorites)</option>
+                <option value='[title="Favorites"] ~ div > div > [title="Inbox"] span:nth-of-type(2) > span'>
+                  outlook.live.com beta (just Favorites Inbox)</option>
+              </select>
+              <input id="cssForUnreadEmailsDetection" type="text" style="margin-top: 8px;">
+            </div>
+
+            <div class="form-group">
+              <label for="selectCssForVisibleRemindersDetection">Reminders Selector</label>
+              <select id="selectCssForVisibleRemindersDetection">
+                <option value=''>Auto</option>
+                <option value=''>Custom</option>
+                <option value='#spnRmT.alertBtnTxt'>OWA 2010</option>
+                <option value='[aria-label="New Notification"]'>OWA 2013</option>
+                <option value='.o365cs-notifications-notificationPopup .o365cs-notifications-notificationHeaderText'>OWA
+                  365 Personal</option>
+                <option value='.o365cs-flexPane-unseenCount'>OWA 365 Enterprise v1</option>
+                <option value='#O365_Notifications_ButtonID .o365cs-flexPane-unseenitems span:nth-child(1)'>OWA 365
+                  Enterprise v2</option>
+              </select>
+              <input id="cssForVisibleRemindersDetection" type="text" style="margin-top: 8px;">
+            </div>
+
+            <div class="form-group">
+              <label for="selectCssForChatNotificationsDetection">Chat Selector</label>
+              <select id="selectCssForChatNotificationsDetection">
+                <option value=''>Auto</option>
+                <option value=''>Custom</option>
+                <option value='#O365_Lync_ButtonID div.o365cs-flexPane-unseenitems span.o365cs-flexPane-unseenCount'>OWA
+                  365 Personal</option>
+                <option value='.o365cs-notifications-chat-accept'>OWA 365 Enterprise</option>
+              </select>
+              <input id="cssForChatNotificationsDetection" type="text" style="margin-top: 8px;">
+            </div>
+          </div>
+        </details>
       </div>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="selectCssForUnreadEmailsDetection">Css selector for unread emails detection</label>
-          <div class="pref-explanation">If the number of unread emails is not showing at all or you only want certain folders to be
-            included you can use this to customize what is counted as unread email. You can try a predefined option or define one yourself
-            selecting the "Custom" option and entering in the edit box the css you want (some html/css knowledge might be needed).</div>
-        </div>
-        <div class="pref-input">
-          <select id="selectCssForUnreadEmailsDetection">
-            <option value=''>Auto</option>
-            <option value=''>Custom</option>
-            <option value='#mailtree #spnUC #spnCV'>OWA 2010 (ignore favourites)</option>
-            <option value='[fldrnm="Unread Mail"] + #spnUC #spnCV'>OWA 2010 (Unread Mail virtual folder)</option>
-            <option value='[fldrnm="Inbox"] + #spnUC #spnCV'>OWA 2010 (just Inbox)</option>
-            <option value='[aria-label="Folder Pane"] [title="Inbox"] ~ [id*=".ucount"]'>OWA 2013 v1 (just Inbox)</option>
-            <option value='span[title="Inbox"] ~ ._n_07'>OWA 2013 v2 (just Inbox)</option>
-            <option value='span[title="Inbox"]._n_u4 ~._n_A4 ._n_x4[autoid]'>OWA 2013 v3 (just Inbox)</option>
-            <option value='span[title="Inbox"] + div > span'>OWA 365 Personal (just Inbox)</option>
-            <option value='.treeHeaderContainer + [id="MailFolderPane.FavoritesFolders"] [title="Inbox"] + div > span'>OWA 365 Enterprise v1 (just Inbox from Favorites)</option>
-            <option value='#MailFolderPane\.FavoritesFolders > div:nth-child(1) .canShowFavoritesAction > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) span'>OWA 365 Enterprise v2 (from Favorites)</option>
-            <option value='[title="Favorites"] ~ div > div > [title="Inbox"] span:nth-of-type(2) > span'>outlook.live.com beta (just Favorites Inbox)</option>
-          </select>
-          <input id="cssForUnreadEmailsDetection" type="text">
-        </div>
+
+      <div class="button-container">
+        <button type="submit">Save Settings</button>
       </div>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="selectCssForVisibleRemindersDetection">Css selector for reminders detection</label>
-          <div class="pref-explanation">If reminders notifications are not working properly, you can use this to customize the css
-            selector used to detect reminders. You can try a predefined option or define one yourself selecting the "Custom" option and
-            entering in the edit box the css you want (some html/css knowledge might be needed).</div>
-        </div>
-        <div class="pref-input">
-          <select id="selectCssForVisibleRemindersDetection">
-            <option value=''>Auto</option>
-            <option value=''>Custom</option>
-            <option value='#spnRmT.alertBtnTxt'>OWA 2010</option>
-            <option value='[aria-label="New Notification"]'>OWA 2013</option>
-            <option value='.o365cs-notifications-notificationPopup .o365cs-notifications-notificationHeaderText'>OWA 365 Personal</option>
-            <option value='.o365cs-flexPane-unseenCount'>OWA 365 Enterprise v1</option>
-            <option value='#O365_Notifications_ButtonID .o365cs-flexPane-unseenitems span:nth-child(1)'>OWA 365 Enterprise v2</option>
-          </select>
-          <input id="cssForVisibleRemindersDetection" type="text">
-        </div>
-      </div>
-      <div class="pref-container">
-        <div class="pref-description">
-          <label for="selectCssForChatNotificationsDetection">Css selector for chat detection</label>
-          <div class="pref-explanation">If chat notifications are not working properly, you can use this to customize the css selector
-            used to detect chat messages. You can try a predefined option or define one yourself selecting the "Custom" option and entering
-            in the edit box the css you want (some html/css knowledge might be needed).</div>
-        </div>
-        <div class="pref-input">
-          <select id="selectCssForChatNotificationsDetection">
-            <option value=''>Auto</option>
-            <option value=''>Custom</option>
-            <option value='#O365_Lync_ButtonID div.o365cs-flexPane-unseenitems span.o365cs-flexPane-unseenCount'>OWA 365 Personal</option>
-            <option value='.o365cs-notifications-chat-accept'>OWA 365 Enterprise</option>
-          </select>
-          <input id="cssForChatNotificationsDetection" type="text">
-        </div>
-      </div>
-      <button type="submit">Save</button>
-    </fieldset>
-  </form>
+    </form>
+  </div>
   <script src="options.js"></script>
 </body>
+
 </html>

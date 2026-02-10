@@ -1,7 +1,7 @@
 "use strict";
 
 let prefs = {
-  favIconColor : "#0099FF"
+  favIconColor: "#0099FF"
 };
 let newEventsTimer, remindersTimer;
 let unreadEmailsCount = 0;
@@ -103,7 +103,9 @@ function getCountFromNodes(nodes) {
   let count = 0;
   if (nodes) {
     for (let i = nodes.length - 1; i >= 0; i--) {
-      count += extractNumber(nodes[i].innerHTML);
+      if (shouldMonitor(getFolderName(nodes[i]))) {
+        count += extractNumber(nodes[i].innerHTML);
+      }
     }
   }
   return count;
@@ -121,12 +123,68 @@ function getCountFromFolders(folders) {
   return count;
 }
 
+function getFolderName(node) {
+  // Strategy 1: Look for aria-labelledby and find the corresponding element (OWA 2013+)
+  try {
+    let container = node.closest('[role="treeitem"]');
+    if (container) {
+      let labelledBy = container.getAttribute("aria-labelledby");
+      if (labelledBy) {
+        // labelledBy is usually like "_ariaId_X.folder _ariaId_X.ucount"
+        // we want the folder part.
+        let ids = labelledBy.split(" ");
+        for (let id of ids) {
+          let elem = document.getElementById(id);
+          if (elem && elem !== node) { // It's not the count node itself
+            if (elem.title) return elem.title;
+            if (elem.textContent) return elem.textContent;
+          }
+        }
+      }
+
+      // Strategy 2: Look for title in the container (User screenshot case)
+      let titleSpan = container.querySelector("[title]");
+      if (titleSpan) return titleSpan.title;
+    }
+
+    // Strategy 3: Traverse up and look for fldrnm (OWA 2010?)
+    let curr = node;
+    while (curr && curr.tagName !== "BODY") {
+      if (curr.getAttribute("fldrnm")) return curr.getAttribute("fldrnm");
+      if (curr.getAttribute("title") && curr !== node) return curr.getAttribute("title");
+      curr = curr.parentElement;
+    }
+  } catch (e) {
+    console.error("Error in getFolderName", e);
+  }
+  return null;
+}
+
+function shouldMonitor(folderName) {
+  if (!prefs.monitoredFolders || prefs.monitoredFolders.trim() === "") {
+    return true; // Monitor all if no preference set
+  }
+
+  if (!folderName) return false; // If we can't determine folder name, safest is to ignore? Or include? 
+  // Let's ignore to avoid false positives if the user specifically asked for filtering.
+
+  const folders = prefs.monitoredFolders.split(",").map(s => s.trim().toLowerCase()).filter(s => s);
+  const name = folderName.toLowerCase();
+
+  return folders.some(f => name.includes(f));
+}
+
 function getOffice365CountFromNodes(nodes) {
   return Array.from(nodes)
-              .filter(e => e.textContent === 'unread' && e.offsetParent !== null)
-              .map(e => parseInt(e.previousSibling.textContent, 10))
-              .filter(v => !isNaN(v))
-              .reduce((acc, curr) => { return acc + curr}, 0);
+    .filter(e => e.textContent === 'unread' && e.offsetParent !== null)
+    .filter(e => {
+      let countNode = e.previousSibling;
+      let folderName = getFolderName(countNode);
+      return shouldMonitor(folderName);
+    })
+    .map(e => parseInt(e.previousSibling.textContent, 10))
+    .filter(v => !isNaN(v))
+    .reduce((acc, curr) => { return acc + curr }, 0);
 }
 
 function countUnreadEmails() {
@@ -215,8 +273,8 @@ function buildReminderNotificationMessage(count) {
 function triggerNotification(type, text) {
   if (!prefs.disableNotifications) {
     browser.runtime.sendMessage({
-      "type" : type,
-      "msg" : text
+      "type": type,
+      "msg": text
     });
   }
 }
@@ -226,7 +284,7 @@ function checkForNewMessages() {
   let newVisibleRemindersCount = countVisibleReminders();
   let newChatNotificationsCount = countChatNotifications();
   let noChange = (newUnreadEmailsCount === unreadEmailsCount) && (newVisibleRemindersCount === visibleRemindersCount)
-      && (newChatNotificationsCount === chatNotificationsCount);
+    && (newChatNotificationsCount === chatNotificationsCount);
   if (noChange) {
     return;
   }
@@ -269,6 +327,7 @@ function setNewPrefs(newPrefs) {
   prefs.updateFavIcon = defaultVal(prefs.updateFavIcon, true);
   prefs.favIconColor = defaultVal(prefs.favIconColor, "#0099FF");
   prefs.updateDocumentTitle = defaultVal(prefs.updateDocumentTitle, true);
+  prefs.monitoredFolders = defaultVal(prefs.monitoredFolders, "");
   if (prefs.delayBetweenChecks < 1) {
     prefs.delayBetweenChecks = 1;
   }

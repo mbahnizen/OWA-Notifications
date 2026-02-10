@@ -3,26 +3,39 @@
   "name": "Outlook Web App Notifications",
   "short_name": "OWA Notifications",
   "description": "Add system notifications capability to OWA (Outlook Web App). No configuration needed. System notifications about new emails or reminders are shown, the fav icon and window title are also updated with the unread email/reminder count.",
-  "version": "1.9.7",
-  "author": "Mihai Chezan",
-  "homepage_url": "https://github.com/mihai-chezan/owa_notifications_firefox_extension",
+  "version": "1",
+  "author": "mbahnizen",
   "icons": {
     "48": "icon.png"
   },
-  "permissions": ["storage", "notifications"],
+  "permissions": [
+    "storage",
+    "notifications"
+  ],
   "background": {
-    "scripts": ["background.js"]
+    "scripts": [
+      "background.js"
+    ]
   },
-  "content_scripts": [{
-      "matches": ["*://*/owa/*", "https://outlook.live.com/mail/*", "https://outlook.office365.com/mail/*", "https://outlook.office.com/mail/*"],
-      "js": ["content-script.js"]
-  }],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/owa/*",
+        "https://outlook.live.com/mail/*",
+        "https://outlook.office365.com/mail/*",
+        "https://outlook.office.com/mail/*"
+      ],
+      "js": [
+        "content-script.js"
+      ]
+    }
+  ],
   "options_ui": {
     "page": "options.html"
   },
   "applications": {
     "gecko": {
-      "id": "owa_notifications@mihai-chezan.github.com",
+      "id": "owa_notifications@mbahnizen",
       "strict_min_version": "57.0"
     }
   }
