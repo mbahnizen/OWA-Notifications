@@ -41,4 +41,4 @@ A robust Firefox extension that transforms your Outlook Web App (OWA) experience
 4.  Select the `manifest.json` file from the `src` directory.
 
 ---
-*Based on the original OWA Notifier, heavily modified and redesigned by Nizen.*
+*Based on the original [OWA Notifier](https://github.com/mihai-chezan/owa_notifications_firefox_extension) by Mihai Chezan. Heavily modified and redesigned by Nizen.*
