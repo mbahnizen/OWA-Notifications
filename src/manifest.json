@@ -10,7 +10,8 @@
   },
   "permissions": [
     "storage",
-    "notifications"
+    "notifications",
+    "tabs"
   ],
   "background": {
     "scripts": [
@@ -23,7 +24,8 @@
         "*://*/owa/*",
         "https://outlook.live.com/mail/*",
         "https://outlook.office365.com/mail/*",
-        "https://outlook.office.com/mail/*"
+        "https://outlook.office.com/mail/*",
+        "https://mail.atisicloud.com/owa/*"
       ],
       "js": [
         "content-script.js"

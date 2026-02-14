@@ -1,51 +1,44 @@
 # OWA Notifications (Modern Redesign)
 
-A Firefox extension that brings **System Notifications** and **Unread Counts** to Outlook Web App (OWA), now with a modern interface and advanced folder monitoring.
+A robust Firefox extension that transforms your Outlook Web App (OWA) experience with **Smart Notifications**, **Folder Monitoring**, and **Periodic Reminders**.
 
 ## ✨ Key Features
 
-*   **System Notifications**: Get native desktop notifications when new emails arrive, even if the browser is in the background.
-*   **Folder Monitoring**: Monitor specific folders only (e.g., "Inbox", "Important", "Tickets") and ignore the rest.
-*   **Tag Input System**: Easily add folders to monitor using a modern "chip" interface. Support for bulk copy-paste!
-*   **Smart Indicators**:
-    *   **Favicon Overlay**: Shows unread count directly on the OWA tab icon.
-    *   **Title Update**: Updates tab title (e.g., `(2) Inbox`) for easy checking.
-*   **Modern Settings Page**: A clean, card-based designs with toggle switches and instant validation.
+### 🚀 Priority Monitoring
+*   **Watchlist Folders**: Add specific folders (e.g., "Inbox", "IT Support", "Boss") to your **Watchlist**.
+*   **Instant Alerts**: Emails in Watchlist folders trigger **IMMEDIATE** notifications, bypassing any cooldowns.
+*   **Unique Visuals**: Watchlist folders turn the tab icon **Orange**, while regular folders use Blue.
 
-## 🚀 Installation
+### 🧠 Smart Features
+*   **Seamless Auto-Scan**: Automatically detects all your email folders in the background. No manual entry needed!
+*   **Autosave**: Settings are saved automatically as you type or click. No more "Save" buttons.
+*   **Smart Periodic Summary**:
+    *   *Empty Watchlist* = Feature Disabled (Zero noise).
+    *   *Active Watchlist* = Automatically enables a **5-minute recurring summary** of unread items in your important folders.
 
-### For Developers / Temporary Usage
+### 🔔 Advanced Notifications
+*   **Notification Cooldown**: Prevents spam from non-critical folders (e.g., "Newsletters") by limiting popups to once every 60s.
+*   **Calendar Reminders**: Persistent reminders for missed meetings or tasks.
+*   **Silent Mode**: Toggle to mute all popups while keeping the tab title and icon updated.
+
+## ⚙️ How to Use
+
+1.  **Open Options**: Click the extension icon or go to `about:addons`.
+2.  **Build Your Watchlist**:
+    *   The extension automatically scans your folders.
+    *   Click on any **Detected Folder** to add it to your Watchlist.
+    *   OR type a folder name manually and press Enter.
+3.  **Customize**:
+    *   Adjust **Check Frequency** (fixed to 1s for real-time updates).
+    *   Set **Periodic Unread Summary** interval (default: 5m).
+    *   Pick your preferred **Icon Color**.
+
+## 🛠️ Installation (Developer Mode)
+
 1.  Open Firefox and go to `about:debugging`.
 2.  Click **This Firefox** in the sidebar.
 3.  Click **Load Temporary Add-on...**.
-4.  Navigate to the extension folder and select `manifest.json`.
-
-## ⚙️ Configuration
-
-1.  Open the extension **Options** from the `about:addons` page or the toolbar.
-2.  **General**:
-    *   **Check Frequency**: How often to scan for new emails (default: 60 seconds).
-    *   **Monitored Folders**: Type folder names here. Press **Enter** or **Comma** to add them as tags. Paste a comma-separated list to add multiple folders at once!
-3.  **Notifications**: Toggle system popups and reminder snoozing.
-4.  **Display**: specific settings for Favicon color and Title updates.
-
-## 📁 Monitored Folders Guide
-
-By default, the extension monitors **ALL** folders with unread counts.
-To monitor specific folders:
-1.  Go to Options.
-2.  In "Monitored Folders", type the exact name of the folder (e.g., `Inbox`).
-3.  Press Enter.
-4.  Add more folders as needed (e.g., `Projects`, `Urgent`).
-5.  Click **Save Settings**.
-
-Now, notifications will only trigger for emails in these specific folders!
-
-## 🛠️ Technical Info
-
-*   **Manifest V2**: Built for broad compatibility with Firefox.
-*   **Privacy Focused**: Does NOT store credentials. Uses existing OWA session cookies.
-*   **Lightweight**: No heavy background processes; uses efficient DOM parsing.
+4.  Select the `manifest.json` file from the `src` directory.
 
 ---
 *Based on the original OWA Notifier, heavily modified and redesigned by Nizen.*

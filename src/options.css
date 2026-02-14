@@ -1,3 +1,4 @@
+/* Existing CSS */
 :root {
     --primary-color: #2563eb;
     --primary-hover: #1d4ed8;
@@ -209,6 +210,112 @@ button:hover {
     background-color: var(--primary-hover);
 }
 
+/* Secondary Button */
+.secondary-btn {
+    background-color: white;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.secondary-btn:hover {
+    background-color: var(--input-bg);
+    border-color: #d1d5db;
+}
+
+.secondary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Tag/Chip Styles */
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--input-bg);
+    min-height: 46px;
+}
+
+.tag-container input {
+    border: none;
+    background: transparent;
+    padding: 4px;
+    flex: 1;
+    min-width: 100px;
+    box-shadow: none;
+}
+
+.tag-container input:focus {
+    box-shadow: none;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    background-color: #e5e7eb;
+    color: var(--text-main);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    user-select: none;
+}
+
+.tag .close-btn {
+    margin-left: 6px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-weight: bold;
+    line-height: 1;
+}
+
+.tag .close-btn:hover {
+    color: #ef4444;
+    /* Red for remove */
+}
+
+/* Detected Folders Area */
+.detected-container {
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.detected-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.detected-chip {
+    display: inline-block;
+    background-color: #e0f2fe;
+    /* Light blue */
+    color: #0369a1;
+    padding: 4px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.detected-chip:hover {
+    background-color: #bae6fd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: #7dd3fc;
+}
+
+.detected-chip:active {
+    transform: translateY(0);
+}
+
 details {
     background-color: var(--input-bg);
     border: 1px solid var(--border-color);
@@ -231,4 +338,108 @@ summary:hover {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--border-color);
+}
+
+/* Featured / Favorite Chip Style */
+.detected-chip.favorite {
+    background-color: #fef3c7;
+    /* Light amber */
+    color: #d97706;
+    /* Dark amber */
+    border-color: #fde68a;
+    font-weight: 500;
+}
+
+.detected-chip.favorite:hover {
+    background-color: #fde68a;
+    border-color: #fcd34d;
+}
+
+/* Danger Button (Red) */
+.secondary-btn.danger {
+    background-color: #fef2f2;
+    /* Light red */
+    color: #b91c1c;
+    /* Dark red text */
+    border-color: #fecaca;
+}
+
+.secondary-btn.danger:hover {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+/* Small Button (for inline actions) */
+.btn-sm {
+    padding: 2px 8px;
+    font-size: 11px;
+    height: auto;
+    margin-left: 10px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* Section Header in Detected Area */
+.detected-section-header {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.detected-section-header .title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-main);
+}
+
+/* Modern Primary Button (Scan) */
+.primary-btn-modern {
+    width: 100%;
+    background-color: white;
+    color: var(--primary-color);
+    border: 1px dashed var(--primary-color);
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.primary-btn-modern:hover {
+    background-color: #eff6ff;
+    border-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.primary-btn-modern:active {
+    transform: translateY(0);
+}
+
+/* Text Button (Clear) */
+.text-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: underline;
+    box-shadow: none;
+}
+
+.text-btn.danger {
+    color: #ef4444;
+}
+
+.text-btn.danger:hover {
+    color: #b91c1c;
+    background: none;
 }

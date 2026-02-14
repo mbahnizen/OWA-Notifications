@@ -18,20 +18,49 @@
       <div class="card">
         <div class="section-title">General</div>
 
+
         <div class="form-group">
-          <label for="delayBetweenChecks">Check Frequency (seconds)</label>
-          <div class="help-text">How often to check for new emails. Lower value means faster detection (minimum 1).
-          </div>
-          <input id="delayBetweenChecks" type="number" min="1">
+          <label for="checkInterval">Check Frequency (seconds)</label>
+          <div class="help-text">Fixed to 1 second for real-time updates.</div>
+          <input id="checkInterval" type="number" value="1" disabled>
         </div>
 
         <div class="form-group">
-          <label for="monitoredFoldersInput">Monitored Folders</label>
-          <div class="help-text">Type folder name and press Enter or Comma to add. Click X to remove.</div>
-          <div id="tagContainer" class="tag-container">
+          <label for="alertPopupInterval">Periodic Unread Summary</label>
+          <div class="help-text">Shows a recurring popup summary of ALL unread emails in your Monitored Folders. Useful
+            as a reminder for pending tasks.</div>
+          <select id="alertPopupInterval">
+            <option value="0">Disabled</option>
+            <option value="5">Every 5 Minutes</option>
+            <option value="15">Every 15 Minutes</option>
+            <option value="30">Every 30 Minutes</option>
+            <option value="0.17">Test (10 Seconds)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="monitoredFoldersInput">Monitored Folders (Priority)</label>
+          <div class="help-text">Folders listed here trigger <strong>INSTANT popups (no cooldown)</strong> and turn the
+            Monitored Icon color. Other folders will respect the cooldown.</div>
+
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px;">
+            <label style="font-size: 13px; color: var(--text-secondary); margin: 0;">Current Watchlist:</label>
+            <button type="button" id="clearTagsBtn" class="text-btn danger"
+              title="Remove all folders from watch list">Clear List</button>
+          </div>
+          <div id="tagContainer" class="tag-container" style="margin-bottom: 24px;">
             <input id="monitoredFoldersInput" type="text" placeholder="Add folder..." autocomplete="off">
           </div>
           <input id="monitoredFolders" type="hidden">
+
+          <div style="margin-bottom: 12px;">
+            <button type="button" id="scanFoldersBtn" class="primary-btn-modern"
+              title="Automatically detect folders from your active OWA/Outlook tab.">
+              <span>🔄</span> Refresh Folders
+            </button>
+          </div>
+
+          <div id="detectedFolders" class="detected-container"></div>
         </div>
       </div>
 
@@ -41,8 +70,8 @@
 
         <div class="form-group toggle-row">
           <div class="toggle-label">
-            <label for="disableNotifications">Disable System Notifications</label>
-            <div class="help-text">If enabled, you won't get pop-up alerts, but the icon/title will still update.</div>
+            <label for="disableNotifications">Silent Mode (No Pop-ups)</label>
+            <div class="help-text">Disable all pop-up notifications. Only the tab icon and title will update.</div>
           </div>
           <label class="toggle-switch">
             <input id="disableNotifications" type="checkbox">
@@ -51,9 +80,17 @@
         </div>
 
         <div class="form-group">
-          <label for="delayBetweenReminders">Reminder Snooze Time (seconds)</label>
-          <div class="help-text">Repeat interval for reminder notifications. Set to 0 to disable repeating.</div>
-          <input id="delayBetweenReminders" type="number" min="0">
+          <label for="notificationCooldown">Standard Notification Cooldown (seconds)</label>
+          <div class="help-text">Prevents notification spam from <strong>non-monitored folders</strong>. Limits popups
+            to once every X seconds. Does NOT apply to Monitored Folders.</div>
+          <input id="notificationCooldown" type="number" min="0">
+        </div>
+
+        <div class="form-group">
+          <label for="reminderInterval">Calendar/Meeting Reminder Interval (seconds)</label>
+          <div class="help-text">If you have unread <strong>Calendar or Task</strong> reminders, repeat the notification
+            pop-up every X seconds until dismissed. Set 0 to disable repeating.</div>
+          <input id="reminderInterval" type="number" min="0">
         </div>
       </div>
 
@@ -74,8 +111,9 @@
 
         <div class="form-group toggle-row">
           <div class="toggle-label">
-            <label for="updateFavIcon">Update Favicon</label>
-            <div class="help-text">Show unread count overlay on the tab icon.</div>
+            <label for="updateFavIcon">Update Tab Icon</label>
+            <div class="help-text">Change OWA icon color based on unread status (Orange for Monitored, Blue for Others).
+            </div>
           </div>
           <label class="toggle-switch">
             <input id="updateFavIcon" type="checkbox">
@@ -85,8 +123,8 @@
 
         <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
           <div>
-            <label for="favIconColor">Favicon Badge Color</label>
-            <div class="help-text">Background color for the unread count badge.</div>
+            <label for="favIconColor">Monitored Icon Color</label>
+            <div class="help-text">Color for the unread count badge when Monitored Folders have email.</div>
           </div>
           <input id="favIconColor" type="color">
         </div>
@@ -158,8 +196,12 @@
         </details>
       </div>
 
-      <div class="button-container">
-        <button type="submit">Save Settings</button>
+      <div class="form-actions" style="display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" id="resetBtn" class="secondary-btn" style="color: #d32f2f; border-color: #d32f2f;">Reset
+          to Defaults</button>
+        <div id="saveStatus"
+          style="color: var(--success-color, #2e7d32); font-weight: 500; opacity: 0; transition: opacity 0.5s;">Saved
+        </div>
       </div>
     </form>
   </div>
