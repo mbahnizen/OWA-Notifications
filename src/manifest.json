@@ -37,7 +37,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "owa_notifications@mbahnizen",
+      "id": "owa_notifications_2.0@mbahnizen",
       "strict_min_version": "128.0",
       "data_collection_permissions": {
         "required": [
