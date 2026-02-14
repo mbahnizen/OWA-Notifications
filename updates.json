@@ -1,0 +1,12 @@
+{
+    "addons": {
+        "owa_notifications@mbahnizen": {
+            "updates": [
+                {
+                    "version": "2.0",
+                    "update_link": "https://github.com/mbahnizen/OWA-Notifications/releases/download/v2.0/owa_notifications-2.0.xpi"
+                }
+            ]
+        }
+    }
+}
