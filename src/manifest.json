@@ -2,8 +2,8 @@
   "manifest_version": 2,
   "name": "Outlook Web App Notifications",
   "short_name": "OWA Notifications",
-  "description": "Add system notifications capability to OWA (Outlook Web App). No configuration needed. System notifications about new emails or reminders are shown, the fav icon and window title are also updated with the unread email/reminder count.",
-  "version": "1.3",
+  "description": "Transforms OWA with smart notifications, priority folder monitoring, and periodic summaries. Features a modern UI with seamless auto-scan and custom alerts.",
+  "version": "2.0",
   "author": "mbahnizen",
   "icons": {
     "48": "icon.png"
