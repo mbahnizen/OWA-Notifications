@@ -132,13 +132,27 @@ See [INSTALL_GUIDE.md](INSTALL_GUIDE.md) for Mozilla signing and permanent `.xpi
 
 ## 🖼️ Screenshots
 
-| View | Preview |
-|------|---------|
-| Tab with notification | ![Tab active](doc/tab-active.png) |
-| Reminder notification | ![Reminder](doc/tab-active-reminder.png) |
-| Pinned tab indicator | ![Pinned](doc/tab-pinned.png) |
-| Taskbar badge | ![Taskbar](doc/taskbar.png) |
-| Settings page | ![Settings](doc/preferences.png) |
+This section showcases the current UI and behavior of the extension.
+
+### 🔔 Notifications
+
+![Notification Example](doc/notification-example.png)
+
+---
+
+### ⚙️ Options Interface
+
+#### General Settings
+![Options 1](doc/UI-Options-1.png)
+
+#### Monitored Folder Settings
+![Options 2](doc/UI-Options-2.png)
+
+#### Notification Settings
+![Notification Settings](doc/UI-Options-3-Notification-Settings.png)
+
+#### Display Settings
+![Display Settings](doc/UI-Options-4-Display.png)
 
 ---
 
