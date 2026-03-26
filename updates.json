@@ -1,6 +1,6 @@
 {
     "addons": {
-        "owa_notifications@mbahnizen": {
+        "owa_notifications_2.0@mbahnizen": {
             "updates": [
                 {
                     "version": "2.0",
@@ -9,4 +9,4 @@
             ]
         }
     }
-}
+}

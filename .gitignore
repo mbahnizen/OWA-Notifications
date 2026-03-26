@@ -1,6 +1,11 @@
 /.project
 /.settings/
-owa_notifications.xpi
+
+# Build Artifacts
+*.xpi
+*.zip
+builds/
+web-ext-artifacts/
 
 # Temporary / Debug Files
 hasil_inspect*
@@ -18,12 +23,10 @@ tmp/
 Thumbs.db
 .DS_Store
 
-# Node / Dependencies (if applicable in future)
+# Node / Dependencies
 node_modules/
-web-ext-artifacts/
+package-lock.json
 
 # AI Agent Config
 .agent/
-
-# Builds / Archives
-builds/
+.gemini/

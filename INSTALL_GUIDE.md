@@ -1,38 +1,78 @@
-# Panduan Instalasi Permanen (Signing)
+# Installation Guide
 
-Secara default, Firefox versi standar memblokir instalasi ekstensi yang belum ditandatangani (unsigned) demi keamanan. Mode `about:debugging` hanya bersifat sementara (hilang saat Firefox ditutup).
+## Prerequisites
 
-Agar bisa diinstal secara permanen, Anda perlu **menandatangani (sign)** ekstensi ini melalui Mozilla Add-ons (AMO). Gratis dan mudah.
+- **Firefox** version 128.0 or later
+- An active **Outlook Web App (OWA)** or **Outlook 365** account accessible in your browser
 
-## Langkah 1: Buat File ZIP
-1.  Masuk ke folder `c:\Nizen\Project\Firefox OWA Extension\src`.
-2.  Pilih **semua file** di dalamnya (`manifest.json`, `options.html`, folder `icons`, dll).
-3.  Klik kanan -> **Sned to** -> **Compressed (zipped) folder**.
-4.  Beri nama file, misalnya `owa-notifications.zip`.
+## Method 1: Temporary Installation (Development / Testing)
 
-> **PENTING**: Jangan men-zip folder `src` dari luar! Anda harus masuk ke dalam folder `src` lalu seleksi isinya, baru di-zip. Jika `manifest.json` tidak ada di root file ZIP, akan error.
+1. Open Firefox and navigate to `about:debugging`
+2. Click **This Firefox** in the sidebar
+3. Click **Load Temporary Add-on...**
+4. Navigate to the `src/` directory of this project
+5. Select the `manifest.json` file
 
-## Langkah 2: Upload ke Mozilla (AMO)
-1.  Buka [Mozilla Add-on Developer Hub](https://addons.mozilla.org/en-US/developers/).
-2.  Login dengan akun Firefox Anda (atau buat baru).
-3.  Klik **Submit a New Add-on**.
-4.  Pilih **On your own** (Self-hosted). Ini artinya ekstensi tidak akan dipajang di toko publik, hanya untuk Anda unduh file `.xpi`-nya.
-5.  Upload file `owa-notifications.zip` yang baru dibuat.
-6.  Tunggu proses validasi otomatis. Jika hijau semua, klik **Sign Add-on**.
+> **Note**: Temporary add-ons are removed when Firefox is closed. This method is ideal for testing.
 
-## Langkah 3: Download & Install
-1.  Setelah selesai, Mozilla akan memberikan link download file `.xpi`.
-2.  Download file tersebut.
-3.  Buka Firefox, lalu drag-and-drop file `.xpi` ke jendela Firefox.
-4.  Klik **Add** saat muncul konfirmasi.
+## Method 2: Permanent Installation (Signed .xpi)
 
-Sekarang ekstensi terinstal permanen! 🎉
+Firefox requires add-ons to be signed by Mozilla for permanent installation.
 
----
-**Alternatif (Tanpa Signing):**
-Jika Anda menggunakan **Firefox Developer Edition** atau **Firefox Nightly**, Anda bisa mematikan syarat signing:
-1.  Ketik `about:config` di address bar.
-2.  Cari `xpinstall.signatures.required`.
-3.  Ubah menjadi `false`.
-4.  Sekarang Anda bisa drag-and-drop file ZIP/XPI langsung tanpa signing.
-*(Tidak disarankan untuk Firefox biasa karena mengurangi keamanan).*
+### Step 1: Create a ZIP package
+
+1. Navigate **inside** the `src/` directory
+2. Select **all files** (`manifest.json`, `background.js`, `content-script.js`, `options.html`, `options.js`, `options.css`, icons, etc.)
+3. Compress them into a ZIP file (e.g., `owa-notifications.zip`)
+
+> **Important**: The `manifest.json` must be at the **root** of the ZIP file. Do not zip the `src/` folder itself from outside — zip its *contents*.
+
+### Step 2: Submit to Mozilla Add-on Developer Hub
+
+1. Go to the [Mozilla Add-on Developer Hub](https://addons.mozilla.org/en-US/developers/)
+2. Sign in with your Firefox Account (or create one)
+3. Click **Submit a New Add-on**
+4. Choose **On your own** (self-hosted distribution)
+5. Upload the ZIP file
+6. Wait for automated validation. If it passes, click **Sign Add-on**
+
+### Step 3: Download and Install
+
+1. After signing, Mozilla provides a download link for the `.xpi` file
+2. Download the `.xpi` file
+3. Drag and drop it into a Firefox window
+4. Click **Add** when prompted
+
+The extension is now permanently installed.
+
+## Alternative: Firefox Developer Edition / Nightly
+
+If you use **Firefox Developer Edition** or **Firefox Nightly**, you can bypass signing:
+
+1. Navigate to `about:config`
+2. Search for `xpinstall.signatures.required`
+3. Set it to `false`
+4. You can now install unsigned `.xpi` or `.zip` files directly
+
+> **Warning**: Disabling signature verification reduces security and is not recommended for general use.
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Extension doesn't activate | Make sure you have an OWA/Outlook tab open and are logged in |
+| No notifications appearing | Check Firefox notification permissions (Settings → Privacy & Security → Notifications) |
+| Folder scan returns empty | Navigate to the Mail view in OWA so the folder tree is visible |
+| Extension removed after restart | You are using temporary mode — follow Method 2 for permanent installation |
+
+## Using with `web-ext` (Developer Workflow)
+
+If you have Node.js installed, you can use Mozilla's `web-ext` tool:
+
+```bash
+npm install -g web-ext
+cd src/
+web-ext run
+```
+
+This launches Firefox with the extension loaded and provides live-reload during development.

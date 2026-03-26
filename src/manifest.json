@@ -5,6 +5,7 @@
   "description": "Transforms OWA with smart notifications, priority folder monitoring, and periodic summaries. Features a modern UI with seamless auto-scan and custom alerts.",
   "version": "2.0",
   "author": "mbahnizen",
+  "homepage_url": "https://github.com/mbahnizen/OWA-Notifications",
   "icons": {
     "48": "icon.png"
   },
@@ -24,8 +25,7 @@
         "*://*/owa/*",
         "https://outlook.live.com/mail/*",
         "https://outlook.office365.com/mail/*",
-        "https://outlook.office.com/mail/*",
-        "https://mail.atisicloud.com/owa/*"
+        "https://outlook.office.com/mail/*"
       ],
       "js": [
         "content-script.js"
@@ -47,4 +47,4 @@
       }
     }
   }
-}
+}

@@ -1,0 +1,24 @@
+{
+  "name": "owa-notifications",
+  "version": "2.0.0",
+  "description": "Firefox extension: smart desktop notifications for Outlook Web App",
+  "private": true,
+  "scripts": {
+    "lint": "web-ext lint --source-dir=src/",
+    "build": "web-ext build --source-dir=src/ --artifacts-dir=builds/",
+    "start": "web-ext run --source-dir=src/"
+  },
+  "devDependencies": {
+    "web-ext": "^8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbahnizen/OWA-Notifications.git"
+  },
+  "author": "mbahnizen",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/mbahnizen/OWA-Notifications/issues"
+  },
+  "homepage": "https://github.com/mbahnizen/OWA-Notifications"
+}

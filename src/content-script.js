@@ -1,5 +1,12 @@
 "use strict";
 
+// ─── Debug Flag ──────────────────────────────────────────────────────
+// Set to true only during development. Logs are suppressed in production
+// to prevent leaking user preferences or folder names to the console.
+const DEBUG = false;
+const log = DEBUG ? console.log.bind(console) : () => {};
+
+// ─── State ───────────────────────────────────────────────────────────
 let prefs = {
   favIconColor: "#FF8000"
 };
@@ -18,10 +25,52 @@ const owaIcon = createIconElement();
 
 browser.storage.onChanged.addListener(onPrefChanged);
 
-getPrefsAndStart();
+// ─── OWA Environment Detection ──────────────────────────────────────
+// Detects whether the current page is actually an OWA/Outlook Web UI
+// by inspecting DOM structure rather than relying solely on URL patterns.
+// This prevents the extension from running on non-OWA pages that happen
+// to match the URL pattern (e.g., /owa/ in an unrelated site).
+
+function isOWAEnvironment() {
+  // Strategy 1: Check for Outlook-specific folder tree (modern OWA/365)
+  const hasTreeItems = document.querySelectorAll('[role="treeitem"]').length > 0;
+  const hasFolderPane = document.getElementById("MailFolderPane.FavoritesFolders") !== null;
+
+  // Strategy 2: Check for OWA-specific notification elements
+  const hasOWANotifications = document.querySelector(".o365cs-notifications-notificationPopup") !== null;
+
+  // Strategy 3: Check for legacy OWA elements
+  const hasMailTree = document.getElementById("mailtree") !== null;
+
+  // Strategy 4: Check for Outlook-specific aria labels
+  const hasFolderPaneLabel = document.querySelector('[aria-label="Folder Pane"]') !== null;
+
+  return hasTreeItems || hasFolderPane || hasOWANotifications || hasMailTree || hasFolderPaneLabel;
+}
+
+// Delay initial start to allow OWA to render its DOM
+setTimeout(() => {
+  if (isOWAEnvironment()) {
+    log("OWA environment detected, starting monitor.");
+    getPrefsAndStart();
+  } else {
+    log("OWA environment NOT detected. Retrying in 5s...");
+    // OWA can be slow to render — retry once after 5 seconds
+    setTimeout(() => {
+      if (isOWAEnvironment()) {
+        log("OWA environment detected on retry, starting monitor.");
+        getPrefsAndStart();
+      } else {
+        log("OWA environment not found after retry. Extension will not activate on this page.");
+      }
+    }, 5000);
+  }
+}, 2000);
+
+// ─── Favicon Utilities ───────────────────────────────────────────────
 
 function createIconElement() {
-  let icon = document.createElement("link");
+  const icon = document.createElement("link");
   icon.rel = "icon";
   icon.type = "image/png";
   icon.sizes = "16x16";
@@ -30,14 +79,11 @@ function createIconElement() {
 }
 
 function getCurrentFavIcon() {
-  let icons = document.head.querySelectorAll("link[rel*=icon]");
-  let icon;
+  const icons = document.head.querySelectorAll("link[rel*=icon]");
   if (icons.length > 0) {
-    icon = icons[icons.length - 1];
-  } else {
-    icon = createIconElement();
+    return icons[icons.length - 1];
   }
-  return icon;
+  return createIconElement();
 }
 
 function generateTabIcon(number, colorOverride) {
@@ -45,13 +91,10 @@ function generateTabIcon(number, colorOverride) {
   canvas.width = 16;
   canvas.height = 16;
   const ctx = canvas.getContext("2d");
-  // draw cliped circle (radius is bigger than canvas by 1px) - the effect is a
-  // square with round corners
   ctx.fillStyle = colorOverride || prefs.favIconColor;
   ctx.beginPath();
   ctx.arc(8, 8, 9, 0, 2 * Math.PI);
   ctx.fill();
-  // draw the number in center
   ctx.font = "bold 12px Helvetica, sans-serif";
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
@@ -78,6 +121,8 @@ function setFavicon(count, color) {
   }
 }
 
+// ─── Document Title ──────────────────────────────────────────────────
+
 function restoreInitialDocumentTitle() {
   document.title = initialDocumentTitle;
 }
@@ -94,13 +139,46 @@ function setDocumentTitle(emails, reminders, chats) {
   document.title = countPrefix + initialDocumentTitle;
 }
 
+// ─── Count Extraction Helpers ────────────────────────────────────────
+
+/**
+ * Extracts the first integer found in a string.
+ * Used to parse unread count numbers from DOM node text.
+ * @param {string} text - The text to extract a number from.
+ * @returns {number} The extracted number, or 0 if none found.
+ */
+function extractNumber(text) {
+  if (!text) return 0;
+  const match = text.match(/(\d+)/);
+  return match ? parseInt(match[1], 10) : 0;
+}
+
+/**
+ * Counts the total number of visible DOM nodes in a NodeList.
+ * Used for counting reminders and chat notification elements.
+ * @param {NodeList} nodes - The nodes to count.
+ * @returns {number} The count of visible nodes.
+ */
+function getCountFromNodes(nodes) {
+  if (!nodes) return 0;
+  let count = 0;
+  for (let i = 0; i < nodes.length; i++) {
+    // Only count visible nodes (offsetParent is null for hidden elements)
+    if (nodes[i].offsetParent !== null) {
+      count++;
+    }
+  }
+  return count;
+}
+
+// ─── Folder Detection ────────────────────────────────────────────────
 
 function getCountsFromNodes(nodes) {
-  let counts = [];
+  const counts = [];
   if (nodes) {
     for (let i = nodes.length - 1; i >= 0; i--) {
-      let folderName = getFolderName(nodes[i]);
-      let count = extractNumber(nodes[i].innerHTML);
+      const folderName = getFolderName(nodes[i]);
+      const count = extractNumber(nodes[i].textContent);
       if (count > 0) {
         counts.push({ name: folderName, count: count });
       }
@@ -109,35 +187,29 @@ function getCountsFromNodes(nodes) {
   return counts;
 }
 
-// Removed getItemsWithActiveCount as it was only used for OWA 2013 legacy strategy
-
-// Removed getCountsFromFolders as it was only used for OWA 2013 legacy strategy
-
 function getFolderName(node) {
-  // Strategy 1: Look for aria-labelledby and find the corresponding element (OWA 2013+)
   try {
-    let container = node.closest('[role="treeitem"]');
+    // Strategy 1: aria-labelledby (OWA 2013+)
+    const container = node.closest('[role="treeitem"]');
     if (container) {
-      let labelledBy = container.getAttribute("aria-labelledby");
+      const labelledBy = container.getAttribute("aria-labelledby");
       if (labelledBy) {
-        // labelledBy is usually like "_ariaId_X.folder _ariaId_X.ucount"
-        // we want the folder part.
-        let ids = labelledBy.split(" ");
-        for (let id of ids) {
-          let elem = document.getElementById(id);
-          if (elem && elem !== node) { // It's not the count node itself
+        const ids = labelledBy.split(" ");
+        for (const id of ids) {
+          const elem = document.getElementById(id);
+          if (elem && elem !== node) {
             if (elem.title) return elem.title;
             if (elem.textContent) return elem.textContent;
           }
         }
       }
 
-      // Strategy 2: Look for title in the container (User screenshot case)
-      let titleSpan = container.querySelector("[title]");
+      // Strategy 2: title in the container
+      const titleSpan = container.querySelector("[title]");
       if (titleSpan) return titleSpan.title;
     }
 
-    // Strategy 3: Traverse up and look for fldrnm (OWA 2010?)
+    // Strategy 3: fldrnm attribute (legacy OWA)
     let curr = node;
     while (curr && curr.tagName !== "BODY") {
       if (curr.getAttribute("fldrnm")) return curr.getAttribute("fldrnm");
@@ -145,47 +217,43 @@ function getFolderName(node) {
       curr = curr.parentElement;
     }
   } catch (e) {
-    console.error("Error in getFolderName", e);
+    log("Error in getFolderName", e);
   }
   return null;
 }
 
 function shouldMonitor(folderName) {
   if (!prefs.monitoredFolders || prefs.monitoredFolders.trim() === "") {
-    return true; // Monitor all if no preference set
+    return true;
   }
-
   if (!folderName) return false;
 
   const folders = prefs.monitoredFolders.split(",").map(s => s.trim().toLowerCase()).filter(s => s);
   const name = folderName.toLowerCase();
-
   return folders.some(f => name.includes(f));
 }
 
-function getOffice365CountsFromNodes(nodes) {
-  return Array.from(nodes)
-    .filter(e => e.textContent === 'unread' && e.offsetParent !== null)
-    .map(e => {
-      let countNode = e.previousSibling;
-      let folderName = getFolderName(countNode);
-      let count = parseInt(e.previousSibling.textContent, 10);
-      return { name: folderName, count: isNaN(count) ? 0 : count };
-    })
-    .filter(item => item.count > 0);
+/**
+ * Safely executes querySelectorAll with a user-provided CSS selector.
+ * Returns an empty NodeList on invalid selectors instead of crashing.
+ */
+function safeQueryAll(selector) {
+  try {
+    return document.querySelectorAll(selector);
+  } catch (e) {
+    log("Invalid CSS selector:", selector, e);
+    return [];
+  }
 }
 
 function getUnreadFolders() {
-  let nodes;
   const results = [];
 
-  // Strategy 1: Modern OWA / Outlook (Treeitems) - Most robust for current version
-  // Iterates over all treeitems (folders) and looks for name and count within them.
+  // Strategy 1: Modern OWA / Outlook (Treeitems)
   const treeItems = document.querySelectorAll('[role="treeitem"]');
   if (treeItems.length > 0) {
     const uniqueFolders = new Map();
     treeItems.forEach(item => {
-      // Find folder name
       let name = "";
       const folderSpan = item.querySelector('[id*=".folder"]');
       if (folderSpan && folderSpan.title) {
@@ -196,34 +264,25 @@ function getUnreadFolders() {
       }
 
       if (name) {
-        // Find unread count
         let count = 0;
-        // Try finding the specific unread count span (usually has id ending in .ucount)
         const ucountSpan = item.querySelector('[id*=".ucount"]');
         if (ucountSpan && ucountSpan.textContent) {
-          const match = ucountSpan.textContent.match(/(\d+)/);
-          if (match) count = parseInt(match[1]);
+          count = extractNumber(ucountSpan.textContent);
         }
 
-        // Fallback: look for the count number directly in the badge div
         if (count === 0) {
-          // The badge is often in a div with a specific class or near the name
-          // Based on provided HTML: div._n_44 > span
           const badgeSpan = item.querySelector('div[class*="_n_44"] span, div[class*="ms-bg-color-neutralLighter"] span');
           if (badgeSpan && badgeSpan.textContent) {
-            const match = badgeSpan.textContent.match(/(\d+)/);
-            if (match) count = parseInt(match[1]);
+            count = extractNumber(badgeSpan.textContent);
           }
         }
 
         if (count > 0) {
-          // Use Map to ensure unique names (deduplicates Favorites vs Tree)
           uniqueFolders.set(name, count);
         }
       }
     });
 
-    // Convert Map back to array of objects
     uniqueFolders.forEach((count, name) => {
       results.push({ name: name, count: count });
     });
@@ -231,46 +290,44 @@ function getUnreadFolders() {
     return results;
   }
 
-  // Legacy Strategies
+  // Legacy: User-provided custom CSS selector
   if (prefs.cssForUnreadEmailsDetection) {
-    return getCountsFromNodes(document.querySelectorAll(prefs.cssForUnreadEmailsDetection));
+    return getCountsFromNodes(safeQueryAll(prefs.cssForUnreadEmailsDetection));
   }
 
-  // Removed OWA 2010/2013 support as per Refactoring Plan
   return [];
 }
 
 function countVisibleReminders() {
   let nodes;
+
   if (prefs.cssForVisibleRemindersDetection) {
-    // custom css
-    return getCountFromNodes(document.querySelectorAll(prefs.cssForVisibleRemindersDetection));
+    return getCountFromNodes(safeQueryAll(prefs.cssForVisibleRemindersDetection));
   }
 
   // Modern OWA / 365
-  if ((nodes = document.querySelectorAll(".o365cs-notifications-notificationPopup .o365cs-notifications-notificationHeaderText")).length > 0) {
-    // 365 new check
+  nodes = document.querySelectorAll(".o365cs-notifications-notificationPopup .o365cs-notifications-notificationHeaderText");
+  if (nodes.length > 0) {
     return getCountFromNodes(nodes);
   }
-  if ((nodes = document.querySelectorAll("[data-storybook=\"reminder\"]")).length > 0) {
-    // outlook.live.com beta
+
+  nodes = document.querySelectorAll('[data-storybook="reminder"]');
+  if (nodes.length > 0) {
     return nodes.length;
   }
 
-  // Removed OWA 2010/2013/Old 365 selectors
   return 0;
 }
 
 function countChatNotifications() {
   if (prefs.cssForChatNotificationsDetection) {
-    return getCountFromNodes(document.querySelectorAll(prefs.cssForChatNotificationsDetection));
+    return getCountFromNodes(safeQueryAll(prefs.cssForChatNotificationsDetection));
   }
-  // it finds twice the real number so split it by two
   return (document.querySelectorAll(".o365cs-notifications-chat-accept").length >> 1);
 }
 
+// ─── Notification Logic ──────────────────────────────────────────────
 
-// popupTimer is now declared at top level state
 let lastPopupTime = Date.now();
 
 function singularOrPlural(word, count) {
@@ -299,68 +356,56 @@ function triggerNotification(type, text) {
 }
 
 function checkPeriodicPopup() {
-  // Debug log to trace spamming issue
-  // console.log("checkPeriodicPopup", prefs.alertPopupInterval, lastPopupTime); 
-
   if (typeof prefs.alertPopupInterval !== 'number' || prefs.alertPopupInterval <= 0) return;
 
   const now = Date.now();
-  // Check if enough time passed (interval is in minutes)
   if (now - lastPopupTime < prefs.alertPopupInterval * 60 * 1000) return;
 
   const unreadFolders = getUnreadFolders();
   const monitoredFolders = unreadFolders.filter(f => shouldMonitor(f.name));
 
   if (monitoredFolders.length > 0) {
-    // Build summary
     const summary = monitoredFolders.map(f => `${f.name}: ${f.count}`).join("\n");
     triggerNotification("email", "Unread Summary:\n" + summary);
   }
 
-  // Update time regardless of whether we notified, to strictly respect the interval.
-  // This prevents "Instant Summary" if an email arrives after a long quiet period.
   lastPopupTime = now;
 }
 
 function checkForNewMessages() {
   const allUnreadFolders = getUnreadFolders();
 
-  // Split into Monitored vs Other
   const monitoredFolders = allUnreadFolders.filter(f => shouldMonitor(f.name));
   const otherFolders = allUnreadFolders.filter(f => !shouldMonitor(f.name));
 
   const currentMonitoredCount = monitoredFolders.reduce((acc, curr) => acc + curr.count, 0);
   const currentOtherCount = otherFolders.reduce((acc, curr) => acc + curr.count, 0);
 
-  let newVisibleRemindersCount = countVisibleReminders();
-  let newChatNotificationsCount = countChatNotifications();
+  const newVisibleRemindersCount = countVisibleReminders();
+  const newChatNotificationsCount = countChatNotifications();
 
   // Update Favicon
   if (prefs.updateFavIcon) {
-    let totalCount = currentMonitoredCount + currentOtherCount + newVisibleRemindersCount + newChatNotificationsCount;
-    // Determine color
-    let color = prefs.favIconColor; // Default (Orange)
+    const totalCount = currentMonitoredCount + currentOtherCount + newVisibleRemindersCount + newChatNotificationsCount;
+    let color = prefs.favIconColor;
     if (currentMonitoredCount === 0 && currentOtherCount > 0) {
-      color = "#0099FF"; // Blue for non-urgent
+      color = "#0099FF";
     }
     setFavicon(totalCount, color);
   }
 
   // Update Title
   if (prefs.updateDocumentTitle) {
-    let countToShow = currentMonitoredCount > 0 ? currentMonitoredCount : currentOtherCount;
+    const countToShow = currentMonitoredCount > 0 ? currentMonitoredCount : currentOtherCount;
     setDocumentTitle(countToShow, newVisibleRemindersCount, newChatNotificationsCount);
   }
 
-  // Notifications
-
-  // 1. Monitored Folders (Priority, No Cooldown)
+  // Notifications: Monitored Folders (Priority, No Cooldown)
   if (currentMonitoredCount > state.monitoredCount) {
     const diff = currentMonitoredCount - state.monitoredCount;
     triggerNotification("email", buildEmailNotificationMessage(diff));
   }
-
-  // 2. Other Folders (Respect Cooldown)
+  // Other Folders (Respect Cooldown)
   else if (currentOtherCount > state.otherCount) {
     const hasMonitoredFolders = prefs.monitoredFolders && prefs.monitoredFolders.trim().length > 0;
 
@@ -389,7 +434,6 @@ function checkForNewMessages() {
   state.remindersCount = newVisibleRemindersCount;
   state.chatCount = newChatNotificationsCount;
 
-  // Periodic check
   checkPeriodicPopup();
 }
 
@@ -402,13 +446,12 @@ function notifyReminders() {
   }
 }
 
+// ─── Folder Scanning (for Options page) ──────────────────────────────
+
 function scanFolders() {
   const favorites = new Set();
   const others = new Set();
 
-  // Strategy 1: Treeitems (Modern OWA)
-  // 1.a. Identifying Favorites Container
-  // Based on inspect: id="MailFolderPane.FavoritesFolders" contains favorite items
   const favoritesContainer = document.getElementById("MailFolderPane.FavoritesFolders");
 
   const processItem = (item, set) => {
@@ -418,7 +461,6 @@ function scanFolders() {
       name = folderSpan.title;
     } else {
       const titleSpan = item.querySelector('span[title]');
-      // Avoid "Favorites" header itself if caught
       if (titleSpan) name = titleSpan.title;
     }
 
@@ -429,26 +471,12 @@ function scanFolders() {
 
   const allTreeItems = document.querySelectorAll('[role="treeitem"]');
   allTreeItems.forEach(item => {
-    // Check if this item is inside the favorites container
     if (favoritesContainer && favoritesContainer.contains(item)) {
       processItem(item, favorites);
     } else {
       processItem(item, others);
     }
   });
-
-  // Fallback / Clean up if no container found but permissions/versions differ? 
-  // For now rely on the ID as it seemed consistent in the user's HTML.
-
-  // Note: users might have same folder name in both (e.g. Inbox), usually we want to distinguish?
-  // But for monitoring, "Inbox" is just "Inbox" to the folder scanner?
-  // Actually getUnreadFolders distinguishes logic by location, but the user just inputs the NAME.
-  // The extension's `getUnreadFolders` scans *all* locations and matches by name.
-  // So if "Inbox" is in Favorites AND in Folders, adding "Inbox" to monitored list will cover both technically 
-  // (depending on how getUnreadFolders counts). 
-  // Current getUnreadFolders iterates ALL treeitems. If "Inbox" appears twice (once in Fav, once in Tree),
-  // it finds both. The `shouldMonitor` checks if name is in list. 
-  // So adding "Inbox" once is enough.
 
   return {
     favorites: Array.from(favorites).sort(),
@@ -459,26 +487,29 @@ function scanFolders() {
 // Message Listener from Options Page
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.cmd === "CMD_SCAN_FOLDERS") {
-    // Returns { favorites: [], others: [] }
     const result = scanFolders();
     sendResponse({ result: result });
   }
 });
 
+// ─── Preferences ─────────────────────────────────────────────────────
+
+function defaultVal(value, defaultValue) {
+  return (typeof value === "undefined" || value === null) ? defaultValue : value;
+}
+
 function setNewPrefs(newPrefs) {
   prefs = newPrefs;
 
   const ensureNumber = (val, def) => {
-    let n = parseFloat(val);
+    const n = parseFloat(val);
     return isNaN(n) ? def : n;
   };
 
-  // set defaults with migration for old keys
-  // First resolve the key migration
-  let checkInt = (prefs.checkInterval !== undefined) ? prefs.checkInterval : prefs.delayBetweenChecks;
+  const checkInt = (prefs.checkInterval !== undefined) ? prefs.checkInterval : prefs.delayBetweenChecks;
   prefs.checkInterval = 1; // Enforced 1s
 
-  let remindInt = (prefs.reminderInterval !== undefined) ? prefs.reminderInterval : prefs.delayBetweenReminders;
+  const remindInt = (prefs.reminderInterval !== undefined) ? prefs.reminderInterval : prefs.delayBetweenReminders;
   prefs.reminderInterval = ensureNumber(remindInt, 300);
 
   prefs.disableNotifications = defaultVal(prefs.disableNotifications, false);
@@ -497,20 +528,12 @@ function setNewPrefs(newPrefs) {
   }
 }
 
-function defaultVal(value, defaultValue) {
-  return (typeof value === "undefined" || value === null) ? defaultValue : value;
-}
+// ─── Timers ──────────────────────────────────────────────────────────
 
 function stopTimers() {
-  if (newEventsTimer) {
-    clearInterval(newEventsTimer);
-  }
-  if (remindersTimer) {
-    clearInterval(remindersTimer);
-  }
-  if (popupTimer) {
-    clearInterval(popupTimer);
-  }
+  if (newEventsTimer) clearInterval(newEventsTimer);
+  if (remindersTimer) clearInterval(remindersTimer);
+  if (popupTimer) clearInterval(popupTimer);
 }
 
 function startMonitor() {
@@ -520,21 +543,19 @@ function startMonitor() {
   if (prefs.reminderInterval > 0) {
     remindersTimer = setInterval(notifyReminders, prefs.reminderInterval * 1000);
   }
-  // Check for periodic popup readiness frequently (every 1s)
-  // The function itself checks if enough time has passed.
   if (prefs.alertPopupInterval > 0) {
     popupTimer = setInterval(checkPeriodicPopup, 1000);
   }
 }
 
-function onGotPrefs(prefs) {
-  console.log("onGotPrefs: ", prefs);
-  setNewPrefs(prefs);
+function onGotPrefs(loadedPrefs) {
+  log("onGotPrefs:", loadedPrefs);
+  setNewPrefs(loadedPrefs);
   startMonitor();
 }
 
 function getPrefsAndStart() {
-  browser.storage.local.get().then(onGotPrefs, console.error);
+  browser.storage.local.get().then(onGotPrefs, (err) => log("Error loading prefs:", err));
 }
 
 function resetState() {
@@ -548,7 +569,7 @@ function resetState() {
 }
 
 function onPrefChanged(changes, area) {
-  console.log("onPrefChanged: ", changes);
+  log("onPrefChanged:", changes);
   resetState();
   getPrefsAndStart();
 }
