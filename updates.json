@@ -3,8 +3,8 @@
         "owa_notifications_2.0@mbahnizen": {
             "updates": [
                 {
-                    "version": "2.1.1",
-                    "update_link": "https://github.com/mbahnizen/OWA-Notifications/releases/download/v2.1.1/owa_notifications-2.1.1.xpi"
+                    "version": "2.1.2",
+                    "update_link": "https://github.com/mbahnizen/OWA-Notifications/releases/download/v2.1.2/owa_notifications-2.1.2.xpi"
                 }
             ]
         }
