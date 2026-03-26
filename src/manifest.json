@@ -3,7 +3,7 @@
   "name": "Outlook Web App Notifications",
   "short_name": "OWA Notifications",
   "description": "Transforms OWA with smart notifications, priority folder monitoring, and periodic summaries. Features a modern UI with seamless auto-scan and custom alerts.",
-  "version": "2.0",
+  "version": "2.1.1",
   "author": "mbahnizen",
   "homepage_url": "https://github.com/mbahnizen/OWA-Notifications",
   "icons": {
@@ -38,7 +38,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "owa_notifications_2.0@mbahnizen",
-      "strict_min_version": "128.0",
+      "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": [
           "none"
