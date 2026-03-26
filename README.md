@@ -2,10 +2,26 @@
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](LICENSE)
 [![Firefox Add-on](https://img.shields.io/badge/Firefox-Add--on-FF7139?logo=firefox-browser&logoColor=white)](https://addons.mozilla.org/firefox/)
+[![Install from AMO](https://img.shields.io/badge/Install-Firefox_Add--on-FF7139?logo=firefox-browser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/owa-notifications-by-mbahnizen/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search)
 [![No External Requests](https://img.shields.io/badge/Network_Calls-ZERO-blue.svg)](#privacy--security)
 [![CI](https://img.shields.io/github/actions/workflow/status/mbahnizen/OWA-Notifications/lint.yml?label=lint)](https://github.com/mbahnizen/OWA-Notifications/actions)
 
 **Smart desktop notifications for Outlook Web App — fully offline, privacy-first.**
+
+---
+
+## 🚀 Install
+
+Install the extension directly from Mozilla Add-ons:
+
+👉 [**OWA Notifications on Firefox Add-ons**](https://addons.mozilla.org/en-US/firefox/addon/owa-notifications-by-mbahnizen/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search)
+
+### Steps:
+1. Open the link above in Firefox
+2. Click **"Add to Firefox"**
+3. Confirm installation
+
+The extension will be installed and ready to use immediately.
 
 ---
 
@@ -118,15 +134,16 @@ OWA Page (DOM)
 
 ## 📦 Installation
 
-### Quick Start (Temporary)
+### 🚀 Install from AMO (Recommended)
+You can install the extension in one click directly from the [Mozilla Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/owa-notifications-by-mbahnizen/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search). This is the fastest, safest, and most straightforward method.
+
+### 🧪 Manual / Developer Installation (Optional)
 
 1. Open Firefox → navigate to `about:debugging`
 2. Click **This Firefox** → **Load Temporary Add-on**
 3. Select `src/manifest.json` from this project
 
-### Permanent Installation
-
-See [INSTALL_GUIDE.md](INSTALL_GUIDE.md) for Mozilla signing and permanent `.xpi` installation.
+See [INSTALL_GUIDE.md](INSTALL_GUIDE.md) for full developer compilation and permanent `.xpi` installation instructions.
 
 ---
 
