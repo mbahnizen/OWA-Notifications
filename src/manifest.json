@@ -25,6 +25,7 @@
         "*://*/owa/*",
         "https://outlook.live.com/mail/*",
         "https://outlook.office365.com/mail/*",
+        "https://outlook.office365.us/mail/*",
         "https://outlook.office.com/mail/*",
         "https://outlook.cloud.microsoft/mail/*"
       ],
